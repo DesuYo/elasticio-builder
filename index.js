@@ -36,7 +36,7 @@ exports.request = function (options) {
       reqOptions.headers = headers || {}
       if (auth) {
         const { headerName = 'Authorization', func } = auth
-        const res = await func(cfg)
+        const res = await func(input)
         reqOptions.headers[headerName] = res.authString
         if (res && res.constructor === Object) input = merge(input, res)
       }
