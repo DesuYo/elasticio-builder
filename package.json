@@ -1,0 +1,16 @@
+{
+  "name": "elasticio-builder",
+  "version": "0.0.1",
+  "description": "Awesome tools for elastic.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 0"
+  },
+  "keywords": [],
+  "author": "Oleh, <opavlov@conceptsoft.io>",
+  "license": "ISC",
+  "dependencies": {
+    "got": "^8.3.0",
+    "lodash": "^4.17.5"
+  }
+}
