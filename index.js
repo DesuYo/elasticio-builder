@@ -3,10 +3,17 @@ const { merge } = require('lodash')
 const tools = require('./tools')
 
 /**
+ * @typedef {object} AuthOptions
+ * @property {string} [headerName] - Authorization header name
+ * @property {Function<Promise<object>>} func - Async func witch returns <authString> on resolve
+ */
+
+/**
  * @typedef {object} RequestOptions
  * @property {string} method - Request method
  * @property {string} url - Request URL. You can pass variables with {name} notation
- * @property {Object.<string,*>} [headers] - Additional request headers. For example you can use it for auth header
+ * @property {AuthOptions} auth - Authorization options
+ * @property {Object.<string,*>} [headers] - Additional request headers
  * @property {Object.<string,*>} [spreadInput] - Additional input properties
  * @property {Object.<string,*>} [spreadBody] - Spread request body. You can pass variables with {name} notation
  * @property {boolean} isFormData - If true, send body as form data
@@ -20,15 +27,20 @@ const tools = require('./tools')
 exports.request = function (options) {
   return async function () {
     try {
-      let { method, url, headers, spreadInput, spreadBody, isFormData } = options
+      let { method, url, auth, headers, spreadInput, spreadBody, isFormData } = options
       let msg = arguments[0].body || {}
       let input = merge({}, arguments[0], arguments[1], spreadInput)
 
       let reqOptions = {}
       reqOptions.method = method.toUpperCase()
       reqOptions.headers = headers || {}
-      reqOptions.headers['Accept'] = 'application/json'
-
+      if (auth) {
+        const { headerName = 'Authorization', func } = auth
+        const res = await func(cfg)
+        reqOptions.headers[headerName] = res.authString
+        if (res && res.constructor === Object) input = merge(input, res)
+      }
+     
       url = tools.parseValue(url, input, msg)
       if (reqOptions.method === 'GET') {
         if (url.indexOf('?') == -1) url += '?'
@@ -94,10 +106,16 @@ exports.request = function (options) {
 }
 
 /**
+ * @typedef {object} AuthOptions
+ * @property {string} [headerName] - Authorization header name
+ * @property {Function<Promise<object>>} func - Async func witch returns <authString> on resolve
+ */
+
+/**
  * @typedef {object} SelectViewOptions
  * @property {string} url - Request URL. You can pass variables with {name} notation
+ * @property {AuthOptions} auth - Authorization options
  * @property {Object.<string,*>} [headers] - Additional request headers. For example you can use it for auth header
- * @property {Object.<string,*>} [spreadInput] - Additional input properties
  * @property {string} [schemaPath] - Path to schema in response. Use {obj.arr[0].prop} notation
  * @property {string} valuePath - Relative path to select view option's value in schema. Use {obj.arr[0].prop} notation
  * @property {string} titlePath - Relative path to select view option's title in schema. Use {obj.arr[0].prop} notation
@@ -111,9 +129,16 @@ exports.request = function (options) {
 exports.genSelectViewOptions = function(options) {
   return async function(cfg) {
     try {
-      let { url, headers = {}, schemaPath, valuePath, titlePath } = options
-      
+      let { url, auth, headers = {}, schemaPath, valuePath, titlePath } = options
+       
+      if (auth) {
+        const { headerName = 'Authorization', func } = auth
+        const res = await func(cfg)
+        headers[headerName] = res.authString
+        if (res && res.constructor === Object) cfg = merge(cfg, res)
+      }
       console.log(`HEADERS: ${JSON.stringify(headers)}`)
+
       url = tools.parseValue(url, cfg)
       console.log(`URL: ${url}`)
       const body = JSON.parse((await got.get(url, { headers })).body)
@@ -133,10 +158,16 @@ exports.genSelectViewOptions = function(options) {
 }
 
 /**
+ * @typedef {object} AuthOptions
+ * @property {string} [headerName] - Authorization header name
+ * @property {Function<Promise<object>>} func - Async func witch returns <authString> on resolve
+ */
+
+/**
  * @typedef {object} MetadataOptions
  * @property {string} url - Request URL. You can pass variables with {name} notation
+ * @property {AuthOptions} auth - Authorization options
  * @property {Object.<string,*>} [headers] - Additional request headers. For example you can use it for auth header
- * @property {Object.<string,*>} [spreadInput] - Additional input properties
  * @property {string} [schemaPath] - Path to schema in response. Use {obj.arr[0].prop} notation
  * @property {string} namePath - Relative path to metadata field name in schema. Use {obj.arr[0].prop} notation
  * @property {string} typePath - Relative path to metadata field type in schema. Use {obj.arr[0].prop} notation
@@ -155,12 +186,17 @@ exports.genMetadata = function(options) {
   return async function(cfg) {
     try {
       let { 
-        url, auth, schemaPath, namePath, typePath, 
+        url, auth, headers = {}, schemaPath, namePath, typePath, 
         propsPath, titlePath, requiredPath, exclude, wrap 
       } = options
       
-      let headers = {};
-      if (auth) headers = (await auth(cfg)).headers
+      if (auth) {
+        const { headerName = 'Authorization', func } = auth
+        const res = await func(cfg)
+        headers[headerName] = res.authString
+        if (res && res.constructor === Object) cfg = merge(cfg, res)
+      }
+    
       url = tools.parseValue(url, cfg)
       const body = JSON.parse((await got.get(url, { headers })).body)
 
