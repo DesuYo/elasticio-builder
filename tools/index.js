@@ -23,7 +23,7 @@ const deepSearch = (obj, path) => {
 
 const parseValue = (schema, input, flowData = {}) => {
   try {
-    let output = {}
+    let output = null
 
     switch (typeof schema) {
       case 'string':
@@ -47,10 +47,15 @@ const parseValue = (schema, input, flowData = {}) => {
         break
       
       case 'object':
-        if (schema.constructor === Array) output = []
         for (let i in schema) { 
           const value = parseValue(schema[i], input, flowData)
-          if (value) output[i] = value
+          if (value) {
+            if (!output) output = schema.constructor === Array ? [] : {}
+            output[i] = value
+          }
+        }
+        for (let i in output) {
+          if (output[i] === null) delete output[i]
         }
     }
 
