@@ -33,7 +33,7 @@ exports.request = function (options) {
 
       let reqOptions = {}
       reqOptions.method = method.toUpperCase()
-      reqOptions.headers = tools.parseValue(headers, input, msg)
+      reqOptions.headers = tools.parseValue(headers, input, msg) || {}
       if (auth) {
         const { headerName = 'Authorization', func } = auth
         const res = await func(input)
@@ -131,7 +131,7 @@ exports.genSelectViewOptions = function(options) {
     try {
       let { url, auth, headers, schemaPath, valuePath, titlePath } = options
        
-      headers = tools.parseValue(headers, cfg)
+      headers = tools.parseValue(headers, cfg) || {}
       if (auth) {
         const { headerName = 'Authorization', func } = auth
         const res = await func(cfg)
@@ -191,7 +191,7 @@ exports.genMetadata = function(options) {
         propsPath, titlePath, requiredPath, exclude, wrap 
       } = options
       
-      headers = tools.parseValue(headers, cfg)
+      headers = tools.parseValue(headers, cfg) || {}
       if (auth) {
         const { headerName = 'Authorization', func } = auth
         const res = await func(cfg)
