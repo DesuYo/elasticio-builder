@@ -12,11 +12,11 @@ const tools = require('./tools')
  * @typedef {object} RequestOptions
  * @property {string} method - Request method
  * @property {string} url - Request URL. You can pass variables with {name} notation
- * @property {AuthOptions} auth - Authorization options
+ * @property {AuthOptions} [auth] - Authorization options
  * @property {Object.<string,*>} [headers] - Additional request headers
  * @property {Object.<string,*>} [spreadInput] - Additional input properties
  * @property {Object.<string,*>} [spreadBody] - Spread request body. You can pass variables with {name} notation
- * @property {boolean} isFormData - If true, send body as form data
+ * @property {boolean} [isFormData] - If true, send body as form data
  */
 
 /**
@@ -33,7 +33,7 @@ exports.request = function (options) {
 
       let reqOptions = {}
       reqOptions.method = method.toUpperCase()
-      reqOptions.headers = headers || {}
+      reqOptions.headers = tools.parseValue(headers, input, msg)
       if (auth) {
         const { headerName = 'Authorization', func } = auth
         const res = await func(input)
@@ -114,7 +114,7 @@ exports.request = function (options) {
 /**
  * @typedef {object} SelectViewOptions
  * @property {string} url - Request URL. You can pass variables with {name} notation
- * @property {AuthOptions} auth - Authorization options
+ * @property {AuthOptions} [auth] - Authorization options
  * @property {Object.<string,*>} [headers] - Additional request headers. For example you can use it for auth header
  * @property {string} [schemaPath] - Path to schema in response. Use {obj.arr[0].prop} notation
  * @property {string} valuePath - Relative path to select view option's value in schema. Use {obj.arr[0].prop} notation
@@ -129,8 +129,9 @@ exports.request = function (options) {
 exports.genSelectViewOptions = function(options) {
   return async function(cfg) {
     try {
-      let { url, auth, headers = {}, schemaPath, valuePath, titlePath } = options
+      let { url, auth, headers, schemaPath, valuePath, titlePath } = options
        
+      headers = tools.parseValue(headers, cfg)
       if (auth) {
         const { headerName = 'Authorization', func } = auth
         const res = await func(cfg)
@@ -166,7 +167,7 @@ exports.genSelectViewOptions = function(options) {
 /**
  * @typedef {object} MetadataOptions
  * @property {string} url - Request URL. You can pass variables with {name} notation
- * @property {AuthOptions} auth - Authorization options
+ * @property {AuthOptions} [auth] - Authorization options
  * @property {Object.<string,*>} [headers] - Additional request headers. For example you can use it for auth header
  * @property {string} [schemaPath] - Path to schema in response. Use {obj.arr[0].prop} notation
  * @property {string} namePath - Relative path to metadata field name in schema. Use {obj.arr[0].prop} notation
@@ -186,10 +187,11 @@ exports.genMetadata = function(options) {
   return async function(cfg) {
     try {
       let { 
-        url, auth, headers = {}, schemaPath, namePath, typePath, 
+        url, auth, headers, schemaPath, namePath, typePath, 
         propsPath, titlePath, requiredPath, exclude, wrap 
       } = options
       
+      headers = tools.parseValue(headers, cfg)
       if (auth) {
         const { headerName = 'Authorization', func } = auth
         const res = await func(cfg)
