@@ -29,7 +29,7 @@ exports.request = function (options) {
     try {
       let { method, url, auth, headers, spreadInput, spreadBody, isFormData } = options
       let msg = arguments[0].body || {}
-      let input = merge({}, arguments[0], arguments[1], spreadInput)
+      let input = merge({}, msg, arguments[0], arguments[1], spreadInput)
 
       let reqOptions = {}
       reqOptions.method = method.toUpperCase()
