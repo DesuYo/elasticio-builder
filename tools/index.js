@@ -45,6 +45,7 @@ const parseValue = (schema, input, flowData = {}) => {
         }
         if (output && flowData[name]) delete flowData[name]
       }
+      else output = schema
       break
       
       case 'object':
