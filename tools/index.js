@@ -27,14 +27,13 @@ const parseValue = (schema, input, flowData = {}) => {
 
     switch (typeof schema) {
       case 'string':
-        const match = schema.match(/\{\{\w+?\}\}/)
-        if (match) {
-          const name = match[0].substring(2, schema.length - 2)
-          output = input[name] || null
-          if (output && flowData[name]) delete flowData[name]
-        }
+      const match = schema.match(/\{.+?\}/)
+      if (match) {
+        const [ name, separator ] = match[0].substring(1, schema.length - 1).split('/')
+        if (separator && typeof input[name] === 'string') output = input[name].split(separator)
+        else if (typeof input[name] === 'object') output = input[name]
         else {
-          const value = schema.replace(/\{\w+?\}/g, sub => {
+          const value = schema.replace(/\{.+?\}/g, sub => {
             const prop = sub.substring(1, sub.length - 1)
             if (input[prop]) {
               if (flowData[prop]) delete flowData[prop]
@@ -44,19 +43,21 @@ const parseValue = (schema, input, flowData = {}) => {
           })
           output = value || null
         }
-        break
+        if (output && flowData[name]) delete flowData[name]
+      }
+      break
       
       case 'object':
-        for (let i in schema) { 
-          const value = parseValue(schema[i], input, flowData)
-          if (value) {
-            if (!output) output = schema.constructor === Array ? [] : {}
-            output[i] = value
-          }
+      for (let i in schema) { 
+        const value = parseValue(schema[i], input, flowData)
+        if (value) {
+          if (!output) output = schema.constructor === Array ? [] : {}
+          output[i] = value
         }
-        for (let i in output) {
-          if (output[i] === null) delete output[i]
-        }
+      }
+      for (let i in output) {
+        if (output[i] === null) delete output[i]
+      }
     }
 
     return output
