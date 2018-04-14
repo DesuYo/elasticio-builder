@@ -1,7 +1,10 @@
 # Elasticio-builder
 Awesome tools for Elastic.io
 ## Getting started
+```
 npm i elasticio-node elasticio-sailor-nodejs elasticio-builder
+```
+* Read [Elastic.io docs](https://support.elastic.io/support/home)
 ## Create action or polling trigger
 For this purpose you can use:
 ```
