@@ -49,7 +49,7 @@ module.exports = async function(cfg) {
 ```
 Auth function should return Promise with object on resolve.
 authString - required property in this object.
-Also we can return other properties, they will be used as additional input data
+Also we can return other properties, they will be used as additional input data.
 ### Advance usage
 What if our body has very complicated structure? Or we just want to add additinal property to it.
 We can do it.
@@ -69,8 +69,8 @@ exports.process = require('elasticio-builder').request({
   }
 })
 ```
-Again, we just use {name} notation to retrieve property from input schema, config's fields or even from auth Promise resolve
-We even can split string and provide array with {name/separator} notation
+Again, we just use {name} notation to retrieve property from input schema, config's fields or even from auth Promise resolve.
+We can even split string and provide array with {name/separator} notation.
 ```
 spreadBody: {
   hobbies: '{hobbies/, }' // "anime, eating sushi, manga" => hobbies: ['anime', 'eating sushi', 'manga']
@@ -81,12 +81,12 @@ Very easy, just look at example :)
 ```
 const { request } = require('elasticio-builder')
 exports.startup = request({
-  method: 'POST'
+  method: 'POST',
   url: 'https://{host}/subscription
 })
 
 exports.shutdown = request({
-  method: 'DELETE'
+  method: 'DELETE',
   url: 'https://{host}/subscription
 })
 
@@ -98,4 +98,60 @@ exports.process = function(msg, cfg) {
   }
 }
 ```
-You can use all stuff from previous section
+You can use all stuff from previous section.
+## Dynamic options in SelectView
+We need some endpoint with schema for our SelectView control. For example api returns this schema:
+```
+{
+  metadata: {
+    size: 3
+  },
+  projects: [
+    { 
+      name: "elasticio", 
+      display: { title: "Elastic.io project" }
+    },
+    {
+      name: "star2star", 
+      display: { title: "Star2Star project" }
+    }
+  ]
+}
+```
+We can use it to create dynamic options for SelectView control like this:
+```
+{
+  "elasticio": "Elastic.io project",
+  "star2star": "Star2Star project"
+}
+```
+Just use notation like this: {obj.arr[0].prop}. And provide all necessary info.
+```
+exports.genOptions = require('elasticio-builder').genSelectViewOptions({
+  url: "https://{host}/schema",
+  auth: {
+    func: require('../verifyCredentials')
+  },
+  schemaPath: 'projects',
+  valuePath: 'name', //relative to schemaPath
+  titlePath: 'display.title' //relative to schemaPath
+})
+```
+## Dynamic metadata
+Something similar we can do to generate dynamic metadata schema.
+```
+exports.getMetaModel = require('elasticio-builder').genMetadata({
+  url: "https://{host}/schema",
+  auth: {
+    func: require('../verifyCredentials')
+  },
+  schemaPath: 'projects',
+  //relative to schemaPath
+  namePath: 'name', 
+  typePath: 'meta.type',
+  propsPath: 'fields',  //for nested objects
+  requiredPath: 'isRequired', 
+  titlePath: 'meta.title',
+  exclude: ['createdAt', 'updatedAt'] //exclude some fields
+})
+```
