@@ -51,7 +51,7 @@ Auth function should return Promise with object on resolve.
 authString - required property in this object.
 Also we can return other properties, they will be used as additional input data.
 ### Advance usage
-What if our body has very complicated structure? Or we just want to add additinal property to it.
+What if our body has very complicated structure? Or we just want to add additional property to it.
 We can do it.
 ```
 exports.process = require('elasticio-builder').request({
