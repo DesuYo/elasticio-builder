@@ -1,16 +1,19 @@
 {
   "name": "elasticio-builder",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Awesome tools for elastic.io",
   "main": "index.js",
   "scripts": {
     "test": "exit 0"
   },
-  "keywords": [],
+  "keywords": [
+    "elastic.io"
+  ],
   "author": "Oleh, <opavlov@conceptsoft.io>",
   "license": "ISC",
   "dependencies": {
     "got": "^8.3.0",
-    "lodash": "^4.17.5"
+    "lodash": "^4.17.5",
+    "xml-js": "^0.4.19"
   }
 }

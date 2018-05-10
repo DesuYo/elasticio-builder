@@ -14,7 +14,6 @@ const tools = require('./tools')
  * @property {string} url - Request URL. You can pass variables with {name} notation
  * @property {AuthOptions} [auth] - Authorization options
  * @property {Object.<string,*>} [headers] - Additional request headers
- * @property {Object.<string,*>} [spreadInput] - Additional input properties
  * @property {Object.<string,*>} [spreadBody] - Spread request body. You can pass variables with {name} notation
  * @property {boolean} [isFormData] - If true, send body as form data
  */

@@ -1,8 +1,14 @@
+const xmlParser = require('xml-js')
+
 const safeJsonParse = value => {
   try {
     return JSON.parse(value)
   } catch (error) {
-    return value
+    try {
+      return xmlParser.xml2js(value, { ignoreComment: true, alwaysChildren: true })
+    } catch (error) {
+      return value
+    }
   }
 }
 
