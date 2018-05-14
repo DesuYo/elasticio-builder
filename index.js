@@ -72,7 +72,7 @@ exports.request = function (options) {
         statusCode,
         payload: tools.safeJsonParse(body) || 'NO MESSAGE'
       }
-      if (this.emit) this.emit('data', { body: preparedData })
+      if (typeof this.emit === 'function') this.emit('data', { body: preparedData })
       else return preparedData
 
     } catch (error) {
@@ -95,7 +95,7 @@ exports.request = function (options) {
           
       }
 
-      if (this.emit) this.emit('data', { body: preparedData })
+      if (typeof this.emit === 'function') this.emit('data', { body: preparedData })
       else return preparedData
 
     } finally {
