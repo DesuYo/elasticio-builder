@@ -99,7 +99,7 @@ exports.request = function (options) {
       else return preparedData
 
     } finally {
-      this.emit('end')
+      if (typeof this.emit === 'function') this.emit('end')
     }
   }
 }
