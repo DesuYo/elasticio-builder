@@ -65,6 +65,11 @@ const parseValue = (schema, input, flowData = {}) => {
       for (let i in output) {
         if (output[i] === null) delete output[i]
       }
+      break
+
+      case 'number':
+      case 'boolean':
+      return output = schema
     }
 
     return output
