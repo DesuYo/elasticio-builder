@@ -64,39 +64,27 @@ exports.request = function (options) {
       console.log(`URL: ${url}`)
       console.log(`REQUEST OPTIONS: ${JSON.stringify(reqOptions)}`) 
 
-      const { requestUrl, statusCode, body } = await got(url, reqOptions)
+      const { body } = await got(url, reqOptions)
       console.log(`RESPONSE BODY: ${body}`)
-
-      const preparedData = { 
-        requestUrl,
-        statusCode,
-        payload: tools.safeJsonParse(body) || 'NO MESSAGE'
-      }
-      if (typeof this.emit === 'function') this.emit('data', { body: preparedData })
-      else return preparedData
+      const res = tools.safeJsonParse(body) || 'NO MESSAGE'
+      
+      if (typeof this.emit === 'function') this.emit('data', { body: res })
+      else return res
 
     } catch (error) {
       console.log(`ERROR: ${error}`)
-      let preparedData = { error: error.message }
+      let res = { error: error.message }
       switch (error.constructor) {
         case got.HTTPError: 
-          const { requestUrl, statusCode, body } = error.response
-          preparedData = { 
-            requestUrl,
-            statusCode, 
-            payload: tools.safeJsonParse(body) || 'NO MESSAGE' 
-          }
+          const { body } = error.response
+          res = tools.safeJsonParse(body) || 'NO MESSAGE'
           break
         case got.RequestError: 
-          preparedData = { 
-            error: 'Invalid URL or server does not response', 
-            hostname: error.hostname
-          }
-          
+          res = { error: 'Invalid URL or server does not response' }
       }
 
-      if (typeof this.emit === 'function') this.emit('data', { body: preparedData })
-      else return preparedData
+      if (typeof this.emit === 'function') this.emit('data', { body: res })
+      else return res
 
     } finally {
       if (typeof this.emit === 'function') this.emit('end')
