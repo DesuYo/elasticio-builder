@@ -36,19 +36,17 @@ const parseValue = (schema, input, flowData = {}) => {
       const match = schema.match(/\{.+?\}/)
       if (match) {
         const [ name, separator ] = match[0].substring(1, schema.length - 1).split('/')
-        const substitute = match[0].substring(1, schema.length - 1).split('?')[1]
         if (separator && typeof input[name] === 'string') output = input[name].split(separator)
-        else if (substitute) {
-          if (input[name]) output = substitute
-          else return null
-        }
         else if (typeof input[name] === 'object') output = input[name]
+        
         else {
           const value = schema.replace(/\{.+?\}/g, sub => {
-            const prop = sub.substring(1, sub.length - 1)
-            if (input[prop]) {
-              if (flowData[prop]) delete flowData[prop]
-              return input[prop]
+            const exp = sub.substring(1, sub.length - 1)
+            const [prop, substitute] = exp.split('?')
+            if (substitute && input[prop]) return substitute
+            else if (input[exp]) {
+              if (flowData[exp]) delete flowData[exp]
+              return input[exp]
             } 
             else return ""
           })
